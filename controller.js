@@ -14,19 +14,38 @@ const UserId = mongoose.model('UserandId', userandId)
 
 //schema for exercise
 const exerciseSchema = new Schema({
-    id: Number,
+    nameId: String,
     description: String,
     duration: Number,
-    date: Date,
+    date: String,
 })
 const exerciseModel = mongoose.model('Exercisemodel', exerciseSchema)
-
-const createExercise = (req, res)=>{
-    const id = req.params
-    let { _id, description, duration, date } = req.body || {date: new Date()};
-    console.log(date)
+const saveEx = async(a, b, c, d)=>{
+    const exadd = new exerciseModel({
+        nameId : a,
+        description: b,
+        duration: c,
+        date: d
+    })
+    const savex = await exadd.save()
+    return savex
 }
-
+const createExercise = async (req, res)=>{
+    const data = req.body;
+    let _id, duration, description, date;
+    ({_id, description, duration, date}= data)
+    _id = _id
+    description = description
+    duration = duration
+    date =  date ? new Date(date).toDateString(): new Date().toDateString()
+    console.log(description, date, req.body)
+    UserId.find({_id: _id})
+    .then(async(data)=>{
+        const savex = await saveEx(_id, description, duration, date);
+        console.log(savex)
+    })
+    
+}
 const createUserdb = async(username)=>{
     const adduser = new UserId({
         name: username
