@@ -94,10 +94,19 @@ const createUser = async(req, res)=>{
 
 }
 
-const getAllLogs = (req, res)=>{
-   const _id = req.params;
-    console.log()
-
+const getAllLogs = async(req, res)=>{
+    const _id = req.params;
+    let count = 1;
+    console.log(_id._id);
+    const cout = await ExerciseModel.countDocuments({user_id: _id._id})
+    const search = await ExerciseModel.find({user_id: _id._id})
+    
+    console.log( cout, search)
+    res.json({
+        count : cout,
+        name: search[0].nameofid,
+        id: search[0].user_id
+    })
 }
 module.exports = {
     createUser,
