@@ -14,37 +14,52 @@ const UserId = mongoose.model('UserandId', userandId)
 
 //schema for exercise
 const exerciseSchema = new Schema({
-    nameId: String,
+    user_id: {
+        type: mongoose.Schema.Types.ObjectId, ref : 'UserId'
+    },
     description: String,
     duration: Number,
     date: String,
+    nameofid: String
 })
-const exerciseModel = mongoose.model('Exercisemodel', exerciseSchema)
-const saveEx = async(a, b, c, d)=>{
-    const exadd = new exerciseModel({
-        nameId : a,
+const ExerciseModel = mongoose.model('Exercisemodel', exerciseSchema)
+
+const saveEx = async(a, b, c, d, e)=>{
+    const exadd = new ExerciseModel({
+        user_id : a,
         description: b,
         duration: c,
-        date: d
+        date: d,
+        nameofid: e
     })
     const savex = await exadd.save()
     return savex
 }
 const createExercise = async (req, res)=>{
     const data = req.body;
-    let _id, duration, description, date;
-    ({_id, description, duration, date}= data)
-    _id = _id
-    description = description
-    duration = duration
-    date =  date ? new Date(date).toDateString(): new Date().toDateString()
-    console.log(description, date, req.body)
-    UserId.find({_id: _id})
-    .then(async(data)=>{
-        const savex = await saveEx(_id, description, duration, date);
-        console.log(savex)
-    })
+    if (data.date == ''){
+        data.date = new Date().toDateString()
+    }else{
+        data.date = new Date(data.date).toDateString()
+    }
     
+    const par = req.params
+    const mong = await UserId.findById(par)
+    if(mong){
+        const savedata = await saveEx(mong._id, data.description, data.duration, data.date, mong.name)
+        console.log(savedata)
+        res.json({
+            _id: mong._id,
+            description: savedata.description,
+            duration: savedata.duration,
+            date: savedata.date,
+            username: savedata.nameofid
+        })
+    }else{
+        res.send('user not found')
+    }
+    
+    //console.log(data.date, data, _id)
 }
 const createUserdb = async(username)=>{
     const adduser = new UserId({
