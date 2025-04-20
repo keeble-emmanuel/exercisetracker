@@ -72,9 +72,14 @@ const createUserdb = async(username)=>{
 const findAllUsers = (req, res)=>{
     UserId.find()
     .then((data)=> {
-        const newArray = data.map(({ name, ...rest })=> rest)
-        console.log(newArray)
-        res.send(newArray)
+        const newarray= []
+        data.forEach((el)=>{
+            const newObj = {username: el.name, _id:el._id}
+            newarray.push(newObj);
+           // console.log(newarray)
+           
+        })
+        res.send(newarray)
     })
     .catch((err)=>console.error(err))
 }
@@ -100,12 +105,22 @@ const getAllLogs = async(req, res)=>{
     console.log(_id._id);
     const cout = await ExerciseModel.countDocuments({user_id: _id._id})
     const search = await ExerciseModel.find({user_id: _id._id})
-    
+    const logs = [];
+    search.forEach((el)=>{
+        newObj = {
+            description: el.description,
+            duration: el.duration,
+            date: el.date
+        }
+        logs.push(newObj)
+    })
     console.log( cout, search)
     res.json({
+       
+        username: search[0].nameofid,
+        id: search[0].user_id,
         count : cout,
-        name: search[0].nameofid,
-        id: search[0].user_id
+        log: logs
     })
 }
 module.exports = {
