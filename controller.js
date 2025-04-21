@@ -101,27 +101,40 @@ const createUser = async(req, res)=>{
 
 const getAllLogs = async(req, res)=>{
     const _id = req.params;
-    let count = 1;
-    console.log(_id._id);
+    
+    
     const cout = await ExerciseModel.countDocuments({user_id: _id._id})
     const search = await ExerciseModel.find({user_id: _id._id})
-    const logs = [];
+    let logs = [];
     search.forEach((el)=>{
         newObj = {
             description: el.description,
             duration: el.duration,
-            date: el.date
+            date: new Date(el.date).toDateString()
         }
         logs.push(newObj)
     })
-    console.log( cout, search)
-    res.json({
+    
+        if(req.query.from){
+            logs= logs.filter((el)=>new Date(el.date )>=new Date(req.query.from))
+        }
+        if(req.query.to){
+            logs = logs.filter((el)=>new Date(el.date) <= new Date(req.query.to))
+        }
+        if(req.query.limit){
+            while(logs.length> req.query.limit){
+               logs.pop() 
+            }
+        }
+        res.json({
        
-        username: search[0].nameofid,
-        id: search[0].user_id,
-        count : cout,
-        log: logs
-    })
+            username: search[0].nameofid,
+            id: search[0].user_id,
+            count : logs.length,
+            log: logs
+        })
+     
+    
 }
 module.exports = {
     createUser,
